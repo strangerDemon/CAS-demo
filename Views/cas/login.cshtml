@@ -1,0 +1,338 @@
+﻿@using ZoneTop.Application.SSO.Common.Grobal;
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+
+    <title>@GrobalConfig.SystemName</title>
+
+    <link rel="stylesheet" href="~/Content/css/element-ui@2.11.1.css" />
+    <link rel="stylesheet" href="~/Content/css/font-awesome.min.css" />
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+
+    <style>
+
+
+
+
+        html, body, #app {
+            height: 100%;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 60px;
+            height: 100px;
+            text-align: center;
+            font-size: 12px;
+            width: 100%
+        }
+
+        .header {
+            position: fixed;
+            top: 0px;
+            height: 75px;
+            width: 100%;
+            border-bottom: 1px solid #D7D7D7;
+        }
+
+        .main-dw {
+            position: fixed;
+            top: 0;
+            height: 220px;
+            width: 100%;
+        }
+
+        .main-bg {
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            overflow-x: hidden;
+            background-position-y: center;
+            background-position-x: center;
+            background-image: url(/Content//images/bg.jpg);
+            height: 435px;
+        }
+
+        .main-block {
+            height: 300px;
+            width: 100%;
+            background-color: #0079FE;
+        }
+
+        .main {
+            position: fixed;
+            top: 50%;
+            margin-top: -210px;
+            width: 100%;
+            text-align: center;
+        }
+
+            .main .content {
+                position: absolute;
+                left: 50%;
+                margin-left: -150px;
+                /*  border-bottom: 10px solid rgba(0, 121, 254, 1); 边框 */
+                background-color: #fff;
+                padding: 20px 40px; /* 边距 */
+                text-align: center;
+                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+                border-radius: 1px;
+            }
+
+            .main .icon {
+                margin: 4px 0 20px 0;
+            }
+
+            .main .title {
+                color: #0079fe;
+                font-size: 24px;
+                font-weight: bolder;
+                letter-spacing: 1px; /* 字间距 */
+            }
+
+
+            .main .desc {
+                color: #0079fe;
+                font-size: 20px;
+                margin-bottom: 20px;
+                letter-spacing: 2px; /* 字间距 */
+            }
+
+
+            .main .el-button--primary {
+                background-color: #0079fe;
+            }
+
+        .login {
+            width: 300px;
+            text-align: left;
+        }
+
+            .login .el-input {
+                margin-bottom: 20px; /* 行间距 */
+            }
+
+            .login .el-input__inner, .login .el-button, .login .el-alert {
+                border-radius: 1px;
+            }
+
+            .login .el-input__icon {
+                font-size: 16px; /* 图标大小 */
+                color: #0079fe;
+                font-weight: bold;
+            }
+
+            .login .btn {
+                margin: 6px 0 16px 0;
+            }
+
+            .login .code {
+                width: 200px; /* 验证码输入框长度 */
+            }
+
+            .login .verifyCode {
+                float: right;
+                padding-top: 6px;
+            }
+
+        .fix {
+            *zoom: 1;
+        }
+
+            .fix:after {
+                content: '';
+                display: table;
+                clear: both;
+            }
+    </style>
+
+    <script>
+        var request = function (keyValue) {
+            var search = location.search.slice(1);
+            var arr = search.split("&");
+            for (var i = 0; i < arr.length; i++) {
+                var ar = arr[i].split("=");
+                if (ar[0] == keyValue) {
+                    if (unescape(ar[1]) == 'undefined') {
+                        return "";
+                    } else {
+                        return unescape(ar[1]);
+                    }
+                }
+            }
+
+            return "";
+        }
+
+        var appService = request('service');
+        var appCode = request('code');
+        var contentPath = '@Url.Content("~")'.substr(0, '@Url.Content("~")'.length - 1);
+        var isIE = !!window.ActiveXObject;
+        var isIE6 = isIE && !window.XMLHttpRequest;
+        if (isIE6) {
+            window.location.href = contentPath + "/cas/error?info=01";
+        }
+
+    </script>
+
+    <script type="text/template" id="v-login">
+        <div class="login">
+
+            <el-input placeholder="请输入用户名"
+                      prefix-icon="el-icon-user"
+                      v-model="username" ref="username"
+                      v-on:keyup.enter.native="handleClickLogin">
+            </el-input>
+
+            <el-input placeholder="请输入用户名"
+                      prefix-icon="el-icon-lock" ref="password"
+                      v-model="password" show-password>
+            </el-input>
+            <el-input class="code" placeholder="请输入验证码"
+                      prefix-icon="el-icon-key" ref="verifyCode"
+                      v-model="verifyCode" v-on:keyup.enter.native="handleClickLogin">
+            </el-input>
+            <div v-on:click="handleClickCode" class="verifyCode fix"><img v-bind:src="codeUrl"> </div>
+            <el-button v-on:click="handleClickLogin" class="btn" type="primary" style="width:100%">登录</el-button>
+            <el-alert v-show="!!errorText" v-bind:title="errorText" type="error" v-bind:closable="false"></el-alert>
+        </div>
+    </script>
+</head>
+<body>
+    <div id="app" style="position:absolute;z-index:0">
+        <div class="main-dw">
+            <div class="main-bg"></div>
+        </div>
+
+        <div class="footer">
+            <p class="tc">
+                版权所有©厦门市土地开发总公司&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;技术支持：福建省地质测绘院（厦门分院）
+                <br />
+                <a style="color:#000" href="http://www.miitbeian.gov.cn/"> 闽ICP备17028613号-1</a>
+            </p>
+            <a href="#"> <img src="~/Content/images/footer-auth.png"> </a>
+        </div>
+
+        <div class="main">
+            <div class="content">
+                <div class="icon">
+                    <img src="../Content/images/xmtz_logo.png" />
+                </div>
+                <div class="title">@GrobalConfig.LoginTitle</div>
+                <div class="desc">@GrobalConfig.LoginDesc</div>
+                <v-login></v-login>
+            </div>
+
+        </div>
+
+    </div>
+    <!--vue-->
+    <script src="~/Content/js/vue@2.6.10.js"></script>
+    <script src="~/Content/js/element-ui@2.11.1.js"></script>
+    <script>
+        Vue.component('v-login', {
+            template: '#v-login',
+            data: function () {
+                return {
+                    flag: true,
+                    loginValue: "登录",
+                    isLoading: false,
+                    username: "",
+                    password: "",
+                    verifyCode: "",
+                    codeUrl: "/cas/VerifyCode?time=" + +new Date(),
+                    errorText: ""
+                }
+            },
+            methods: {
+                toggleLoginState: function (flag) {
+                    if (flag) {
+                        this.isLoading = true;
+                        this.loginValue = "";
+                    } else {
+                        this.isLoading = false;
+                        this.loginValue = "登录";
+                    }
+                },
+                submit: function () {
+                    var vm = this;
+                    //执行登陆操作
+                    $.ajax({
+                        url: contentPath + "/cas/CheckLogin",
+                        data: {
+                            username: vm.username,
+                            password: vm.password,
+                            verifycode: vm.verifyCode,
+                            service: appService,
+                            code: appCode
+                        },
+                        type: "post",
+                        dataType: "JSON",
+                        success: function (data) {
+                            if (data.type == 1) {
+                                var time = new Date().toGMTString();
+                                if (data.service != "") {
+                                    window.location.href = data.service + '?ST=' + data.st;
+                                }
+                                else {
+                                    window.location.href = contentPath + '/cas/index?&time=' + time;
+                                }
+                            } else {
+                                vm.errorText = data.message;
+                                vm.handleClickCode();
+                            }
+                        }
+                    });
+                },
+                checkIsEmpty: function (key, label) {
+                    if (!this[key]) {
+                        this.errorText = label + "!";
+                        this.$refs[key].focus();
+                        return false;
+                    } else {
+                        return true;
+                    }
+                },
+                handleClickLogin: function () {
+
+                    if (this.checkIsEmpty("username", "用户名不能为空")
+                        && this.checkIsEmpty("password", "密码不能为空")
+                        && this.checkIsEmpty("verifyCode", "验证不能为空")) {
+                        this.submit();
+                    }
+
+                },
+                handleClickCode: function () {
+                    this.codeUrl = "/cas/VerifyCode?time=" + +new Date();
+                },
+            },
+            mounted: function () {
+                this.username = "System";
+                this.password = "123456";
+                this.handleClickCode();
+            }
+        });
+
+
+
+        var initVue = new Vue({
+            data: function () {
+                return {
+                    flag: true,
+                }
+            },
+            method: {
+
+            }
+
+
+        })
+
+        $(function () {
+            initVue.$mount('#app');
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+
+    <title>@ZoneTop.Application.SSO.Common.Grobal.GrobalConfig.SystemName</title>
+
+    <link rel="stylesheet" href="~/Content/css/element-ui@2.11.1.css" />
+    <link rel="stylesheet" href="~/Content/css/font-awesome.min.css" />
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <style>
+
+        body {
+            margin: 0px;
+            min-width: 1200px;
+        }
+
+        .el-header {
+            padding: 0px;
+            background: linear-gradient(#409EFF, #53A8FF);
+            color: #FFF;
+            font-size: 36px;
+        }
+
+            .el-header .title-icon {
+                margin: 0 20px;
+            }
+
+            .el-header .title {
+            }
+
+            .el-header .header-right-span {
+                float: right;
+                height: 60px;
+                line-height: 60px;
+            }
+
+                .el-header .header-right-span .user {
+                    font-size: 18px;
+                }
+
+                .el-header .header-right-span .sign-out {
+                    transition: all 0.5s;
+                    cursor: pointer;
+                    margin: 5px 50px 0px 10px;
+                    text-decoration: none;
+                }
+
+        .el-main {
+            width: 100%;
+            height: calc(100vh - 137px);
+            background: linear-gradient(#53A8FF, #79BBFF);
+            padding: 0px;
+        }
+
+            .el-main .client-display-div {
+                position: absolute;
+                min-width: 1200px;
+                width: 100%;
+                height: 33%;
+                bottom: 60px;
+                background-color: #FFF;
+                text-align: center;
+            }
+
+                .el-main .client-display-div .client {
+                    position: relative;
+                    display: inline-block;
+                    margin: 35px 25px 5px 25px;
+                    overflow: hidden;
+                    cursor: pointer;
+                    height: 80%;
+                }
+
+                .el-main .client-display-div .client-1 {
+                    width: 100%;
+                    height: 100%;
+                    margin: 0px;
+                }
+
+                .el-main .client-display-div .client-2 {
+                    width: 35%;
+                    margin: 35px 50px 5px 50px;
+                }
+
+                .el-main .client-display-div .client-3 {
+                    width: 25%;
+                }
+
+                .el-main .client-display-div .client-4 {
+                    width: 20%;
+                }
+
+                .el-main .client-display-div .client-5 {
+                    width: 17%;
+                    margin: 35px 15px 5px 15px;
+                }
+
+                .el-main .client-display-div .client-many {
+                    width: 18%;
+                    height: 50%;
+                    min-width: 320px;
+                    min-height: 230px;
+                }
+
+                .el-main .client-display-div .client .hover-mask {
+                    position: absolute;
+                    padding: 0;
+                    width: 100%;
+                    height: 100%;
+                    top: 0;
+                    left: 0;
+                    background: #000;
+                    opacity: 0;
+                    filter: alpha(opacity=0);
+                    -webkit-transition: all 0.3s ease-out;
+                    transition: all 0.3s ease-out;
+                    color: #fff;
+                }
+
+                    .el-main .client-display-div .client .hover-mask .client-title {
+                        margin: 0;
+                        padding: 16px;
+                        font-size: 24px;
+                        line-height: 24px;
+                        font-weight: 500;
+                        text-align: left;
+                    }
+
+                    .el-main .client-display-div .client .hover-mask .client-content {
+                    }
+
+                .el-main .client-display-div .client .hover-image {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: fill;
+                    webkit-transform: scale(1);
+                    transform: scale(1);
+                    -webkit-transition: -webkit-transform 0.3s ease-out;
+                    transition: transform 0.3s ease-out;
+                }
+
+                .el-main .client-display-div .client:hover .hover-mask {
+                    width: calc(100% - 50px);
+                    height: calc(100% - 50px);
+                    top: 25px;
+                    left: 25px;
+                    opacity: 0.6;
+                }
+
+                .el-main .client-display-div .client:hover .hover-image {
+                    webkit-transform: scale(1.4);
+                    transform: scale(1.4);
+                }
+
+        .el-footer {
+            position: absolute;
+            width: 100%;
+            bottom: 0px;
+            text-align: center;
+        }
+
+        .confirm-logout {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="sys-main">
+        <el-header>
+            <i class="el-icon-wind-power title-icon"></i>
+            <b class="title">{{systemInfo.SystemName}}</b>
+            <span class="header-right-span">
+                <b class="user">{{userInfo.UserName}}</b>
+                <a v-on:click="logout" class="sign-out">
+                    <el-tooltip class="item" effect="light" content="注 销" placement="bottom">
+                        <i class="fa fa-power-off"></i>
+                    </el-tooltip>
+                </a>
+            </span>
+        </el-header>
+        <el-main>
+            <div class="client-display-div">
+                <div v-for="(client,index) in defaullClients" :key="index" :class="'client client-'+defaullClients.length" v-on:click="openSystem(client)">
+                    <img class="hover-image" :src="client.AppIcon" alt="" />
+                    <div class="hover-mask">
+                        <h2 class="client-title">{{client.AppName}}</h2>
+                        <p class="client-content">{{client.Description}}</p>
+                    </div>
+                </div>
+            </div>
+        </el-main>
+        <el-footer>
+            <p>{{systemInfo.Provider+" "+systemInfo.Code}}</p>
+        </el-footer>
+    </div>
+    <!--vue-->
+    <script src="~/Content/js/vue@2.6.10.js"></script>
+    <script src="~/Content/js/element-ui@2.11.1.js"></script>
+    <script>
+        let contentPath = '@Url.Content("~")'.substr(0, '@Url.Content("~")'.length - 1);
+
+        window.sysMainVm = new Vue({
+            el: "#sys-main",
+            data: {
+                userInfo: {//用户信息
+                    userName: "",
+                },
+                systemInfo: {
+                    title: "统一用户管理系统"
+                },//系统信息
+                allClients: [],//所有有权限的客户端
+                defaullClients: [],//默认暂时的客户端
+                noticeInfos: []//消息
+            },
+            watch: {},
+            methods: {
+                ajaxRequest: function (type, url, data, async) {
+                    var _async = async == undefined ? true : async;
+                    return $.ajax({
+                        type: type,
+                        url: url,
+                        data: data,
+                        cache: false,
+                        async: _async
+                    });
+                },
+                initInfos: function () {//初始化系统和用户信息
+                    let vm = this;
+                    vm.ajaxRequest("GET", contentPath + "/cas/GetInfos", "").then(function (resp) {
+                        if (resp) {
+                            var infos = JSON.parse(resp);
+                            //用户
+                            vm.userInfo = infos.userInfo;
+                            //系统
+                            vm.systemInfo = infos.systemInfo;
+                            //客户端
+                            vm.allClients = infos.clientList;
+                            vm.defaullClients = vm.allClients.filter(client => {
+                                client.AppIcon = client.AppIcon == null || client.AppIcon == "" ? "/Content/images/system/" + Math.floor(Math.random() * 3 + 1) + ".jpg" : client.AppIcon;
+                                return client.IsDefaultApp == 1;
+                            });
+                        }
+                    });
+                },
+                openSystem: function (client) {
+                    window.open(client.AppSvcUrl, '_blank');
+                },
+                logout: function () {
+                    window.open(contentPath + "/cas/logout", '_self');
+                }
+            },
+            mounted: function () {
+                this.initInfos();
+            }
+        });
+    </script>
+</body>
+</html>
