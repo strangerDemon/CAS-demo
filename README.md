@@ -1,4 +1,4 @@
-#CAS-demo
+# CAS-demo
 
 ## 使用C#简单实现单点登录功能
 
@@ -9,11 +9,12 @@
 ## 客户端登录将会话SessionId发送给CAS-Server，登出时，根据SessionId进入客户端的私有会话清理用户登录状态.
 
 ## 盗图：
-    ### login:
+
+    ## login:
 ![image](https://github.com/strangerDemon/CAS-demo/blob/master/images/login.png)
 
-    ### logout:
+    ## logout:
 ![image](https://github.com/strangerDemon/CAS-demo/blob/master/images/logout.png)
 
-    ### detail:
+    ## detail:
 ![image](https://github.com/strangerDemon/CAS-demo/blob/master/images/detail.png)
