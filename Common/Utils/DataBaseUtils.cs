@@ -29,7 +29,7 @@ namespace ZoneTop.Application.SSO.Common.Utils
             int accountEqual = 0;
             foreach (BaseUserEntity item in userList)
             {
-                if (item.Account == account)
+                if (item.Account.ToUpper().Equals(account.ToUpper()))//省略大小写
                 {
                     _entity = item;
                     accountEqual++;

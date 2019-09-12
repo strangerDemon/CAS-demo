@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using ZoneTop.Application.SSO.Common.Utils;
@@ -16,10 +17,12 @@ namespace ZoneTop.Application.SSO.Common.Entity
         /// 应用主键
         /// </summary>  
         [Key]
+        [JsonIgnore]
         public string AppId { get; set; }
         /// <summary>
         /// 应用配置ID
-        /// </summary>      
+        /// </summary>
+        [JsonIgnore]
         public string AppSetId { get; set; }
         /// <summary>
         /// 应用名称
@@ -31,8 +34,12 @@ namespace ZoneTop.Application.SSO.Common.Entity
         public string AppSvcUrl { get; set; }
         /// <summary>
         /// 单点登出，0/1
-        /// </summary>      
-        public int SingleLogin { get; set; }
+        /// </summary>
+        public int SingleLogout { get; set; }
+        /// <summary>
+        /// 是否具有强制登出其他人的权限 0 否  1 是
+        /// </summary> 
+        public int ForceLogout { get; set; }
         /// <summary>
         /// 登出URL 必须是前端(前后端分离也必须是前端页面，否则客户端无法获取session）
         /// </summary>      
@@ -58,7 +65,7 @@ namespace ZoneTop.Application.SSO.Common.Entity
         /// </summary>      
         public string AppIcon { get; set; }
         /// <summary>
-        ///应用服务器操作系统：Windows、Linux
+        /// 应用服务器操作系统：Windows、Linux
         /// </summary>      
         public string AppServerSystem { get; set; }
         /// <summary>
@@ -83,15 +90,17 @@ namespace ZoneTop.Application.SSO.Common.Entity
         public int ApiAuth { get; set; }
         /// <summary>
         /// 排序码
-        /// </summary>      
+        /// </summary> 
         public int SortCode { get; set; }
         /// <summary>
         /// 删除标记
         /// </summary>      
+        [JsonIgnore]
         public int DeleteMark { get; set; }
         /// <summary>
         /// 有效标志
         /// </summary>      
+        [JsonIgnore]
         public int EnabledMark { get; set; }
         /// <summary>
         /// 备注
@@ -100,26 +109,32 @@ namespace ZoneTop.Application.SSO.Common.Entity
         /// <summary>
         /// 创建日期
         /// </summary>      
+        [JsonIgnore]
         public DateTime CreateDate { get; set; }
         /// <summary>
         /// 创建用户主键
         /// </summary>      
+        [JsonIgnore]
         public string CreateUserId { get; set; }
         /// <summary>
         /// 创建用户
         /// </summary>      
+        [JsonIgnore]
         public string CreateUserName { get; set; }
         /// <summary>
         /// 修改日期
         /// </summary>      
+        [JsonIgnore]
         public DateTime ModifyDate { get; set; }
         /// <summary>
         /// 修改用户主键
         /// </summary>      
+        [JsonIgnore]
         public string ModifyUserId { get; set; }
         /// <summary>
         /// 修改用户
-        /// </summary>      
+        /// </summary>   
+        [JsonIgnore]
         public string ModifyUserName { get; set; }
         #endregion
 

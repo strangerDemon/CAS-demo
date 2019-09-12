@@ -54,6 +54,25 @@ namespace ZoneTop.Application.SSO.Common.Utils
         }
         #endregion
 
+        #region 获取客户端实例
+        /// <summary>
+        /// 获取客户端实例
+        /// </summary>
+        /// <returns></returns>
+        public virtual ClientEntity GetClient(string clientUrl)
+        {
+            IEnumerable<ClientEntity> clientList = DataBaseUtils.getAllClient();
+            foreach (ClientEntity client in clientList)
+            {
+                if (client.AppSvcUrl.Equals(clientUrl))
+                {
+                    return client;
+                }
+            }
+            throw new Exception("无效客户端");
+        }
+        #endregion
+
         #region 获取用户有权限的客户端
         /// <summary>
         /// 获取用户有权限的客户端
@@ -239,6 +258,7 @@ namespace ZoneTop.Application.SSO.Common.Utils
             }
             catch (Exception ex)
             {
+                LogUtils.myError(log, ex);
                 throw ex;
             }
         }
@@ -435,29 +455,27 @@ namespace ZoneTop.Application.SSO.Common.Utils
         /// <summary>
         /// 客户端 是否能调用接口
         /// </summary>
-        /// <param name="service"></param>
+        /// <param name="client"></param>
         /// <returns></returns>
-        public bool isApiAuth(string service)
+        public void isApiAuth(ClientEntity client)
         {
-            return true;
+            if (client.ApiAuth != 1)
+            {
+                throw new Exception("客户端无调用接口权限！");
+            }
         }
 
         /// <summary>
         /// 判断客户端是否能调用登出接口
         /// </summary>
-        /// <param name="service"></param>
+        /// <param name="client"></param>
         /// <returns></returns>
-        public bool LogoutClient(string service)
+        public void LogoutClient(ClientEntity client)
         {
-            string[] clients = GrobalConfig.LogoutClient.Split(',');
-            foreach (string client in clients)
+            if (client.ForceLogout != 1)
             {
-                if (client.Equals(service))
-                {
-                    return true;
-                }
+                throw new Exception("客户端无权限调用！");
             }
-            return false;
         }
         #endregion 
 

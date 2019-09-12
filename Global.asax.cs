@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
@@ -48,7 +49,7 @@ namespace ZoneTop.Application.SSO
                     UserModel user = UserUtils.Provider.Current();
                     if (user != null)
                     {
-                        List<ClientEntity> clients = ClientUtils.Provider.getAllAuthClient(user.UserId).ToJson().ToList<ClientEntity>();
+                        List<ClientEntity> clients = ClientUtils.Provider.getAllAuthClient(user.UserId).ToList();
                         ClientUtils.Provider.LogoutAllAction(user, clients, "");
                         //清理redis
                         UserUtils.Provider.EmptyCurrentRedis();

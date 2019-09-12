@@ -54,6 +54,60 @@
             padding: 0px;
         }
 
+            .el-main .all-client {
+                position: absolute;
+                min-width: 1200px;
+                width: 100%;
+                text-align: center;
+                height: 400px;
+                top: 100px;
+            }
+
+                .el-main .all-client .box-card {
+                    display: inline-block;
+                    height: 100%;
+                    width: 250px;
+                    margin: 0 10px;
+                }
+
+                    .el-main .all-client .box-card .item {
+                        text-align: left;
+                        font-size: 18px;
+                        margin: 10px;
+                        cursor: pointer;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+
+                        .el-main .all-client .box-card .item:hover {
+                            webkit-transform: scale(1.05);
+                            transform: scale(1.05);
+                            font-weight: 600;
+                        }
+
+                .el-main .all-client .select-app {
+                    position: relative;
+                    display: inline-block;
+                    height: 100%;
+                    width: 600px;
+                    overflow: hidden;
+                    cursor: pointer;
+                }
+
+                    .el-main .all-client .select-app:hover .hover-mask {
+                        width: calc(100% - 50px);
+                        height: calc(100% - 50px);
+                        top: 25px;
+                        left: 25px;
+                        opacity: 0.6;
+                    }
+
+                    .el-main .all-client .select-app:hover .hover-image {
+                        webkit-transform: scale(1.2);
+                        transform: scale(1.2);
+                    }
+
             .el-main .client-display-div {
                 position: absolute;
                 min-width: 1200px;
@@ -98,61 +152,61 @@
                 }
 
                 .el-main .client-display-div .client-many {
-                    width: 18%;
+                    width: 15%;
                     height: 50%;
                     min-width: 320px;
                     min-height: 230px;
                 }
 
-                .el-main .client-display-div .client .hover-mask {
-                    position: absolute;
-                    padding: 0;
-                    width: 100%;
-                    height: 100%;
-                    top: 0;
-                    left: 0;
-                    background: #000;
-                    opacity: 0;
-                    filter: alpha(opacity=0);
-                    -webkit-transition: all 0.3s ease-out;
-                    transition: all 0.3s ease-out;
-                    color: #fff;
-                }
+        .hover-mask {
+            position: absolute;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: #000;
+            opacity: 0;
+            filter: alpha(opacity=0);
+            -webkit-transition: all 0.3s ease-out;
+            transition: all 0.3s ease-out;
+            color: #fff;
+        }
 
-                    .el-main .client-display-div .client .hover-mask .client-title {
-                        margin: 0;
-                        padding: 16px;
-                        font-size: 24px;
-                        line-height: 24px;
-                        font-weight: 500;
-                        text-align: left;
-                    }
+            .hover-mask .client-title {
+                margin: 0;
+                padding: 16px;
+                font-size: 24px;
+                line-height: 24px;
+                font-weight: 500;
+                text-align: left;
+            }
 
-                    .el-main .client-display-div .client .hover-mask .client-content {
-                    }
+            .hover-mask .client-content {
+            }
 
-                .el-main .client-display-div .client .hover-image {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: fill;
-                    webkit-transform: scale(1);
-                    transform: scale(1);
-                    -webkit-transition: -webkit-transform 0.3s ease-out;
-                    transition: transform 0.3s ease-out;
-                }
+        .hover-image {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            webkit-transform: scale(1);
+            transform: scale(1);
+            -webkit-transition: -webkit-transform 0.3s ease-out;
+            transition: transform 0.3s ease-out;
+        }
 
-                .el-main .client-display-div .client:hover .hover-mask {
-                    width: calc(100% - 50px);
-                    height: calc(100% - 50px);
-                    top: 25px;
-                    left: 25px;
-                    opacity: 0.6;
-                }
+        .el-main .client-display-div .client:hover .hover-mask {
+            width: calc(100% - 50px);
+            height: calc(100% - 50px);
+            top: 25px;
+            left: 25px;
+            opacity: 0.6;
+        }
 
-                .el-main .client-display-div .client:hover .hover-image {
-                    webkit-transform: scale(1.4);
-                    transform: scale(1.4);
-                }
+        .el-main .client-display-div .client:hover .hover-image {
+            webkit-transform: scale(1.4);
+            transform: scale(1.4);
+        }
 
         .el-footer {
             position: absolute;
@@ -165,6 +219,17 @@
             position: absolute;
             width: 100%;
             height: 100%;
+        }
+    </style>
+
+    <style>
+
+        .el-card__body {
+            padding: 20px 0 20px 20px;
+        }
+
+        .el-autocomplete-suggestion__wrap {
+            max-height: 400px;
         }
     </style>
 </head>
@@ -183,12 +248,37 @@
             </span>
         </el-header>
         <el-main>
-            <div class="client-display-div">
-                <div v-for="(client,index) in defaullClients" :key="index" :class="'client client-'+defaullClients.length" v-on:click="openSystem(client)">
+            <div class="all-client">
+                <el-card v-if="client!=null" class="box-card">
+                    <el-scrollbar tag="ul" wrap-class="el-autocomplete-suggestion__wrap" view-class="el-autocomplete-suggestion__list">
+                        <div v-for="(_client,index) in allClients" :key="'input'+index" v-on:click="client=_client" class="item">
+                            <el-tooltip class="item" effect="light" :content="_client.AppName" placement="left">
+                                <p>{{_client.AppName}}</p>
+                            </el-tooltip>
+                        </div>
+                    </el-scrollbar>
+                </el-card>
+                <div v-if="client!=null" class="select-app" v-on:click="openSystem(client)">
                     <img class="hover-image" :src="client.AppIcon" alt="" />
                     <div class="hover-mask">
                         <h2 class="client-title">{{client.AppName}}</h2>
                         <p class="client-content">{{client.Description}}</p>
+                    </div>
+                </div>
+                <div v-else-if="isInit" class="select-app">
+                    <img class="hover-image" src="~/Content/images/error/404.png" alt="" />
+                    <div class="hover-mask">
+                        <h2 class="client-title">空空如也</h2>
+                        <p class="client-content">用户无权限,请联系管理员添加</p>
+                    </div>
+                </div>
+            </div>
+            <div class="client-display-div">
+                <div v-for="(_client,index) in defaullClients" :key="index" :class="'client '+clientStyle" v-on:click="openSystem(_client)">
+                    <img class="hover-image" :src="_client.AppIcon" alt="" />
+                    <div class="hover-mask">
+                        <h2 class="client-title">{{_client.AppName}}</h2>
+                        <p class="client-content">{{_client.Description}}</p>
                     </div>
                 </div>
             </div>
@@ -206,15 +296,23 @@
         window.sysMainVm = new Vue({
             el: "#sys-main",
             data: {
-                userInfo: {//用户信息
+                isInit:false,
+                //用户信息
+                userInfo: {
                     userName: "",
                 },
+                //系统信息
                 systemInfo: {
                     title: "统一用户管理系统"
-                },//系统信息
+                },
+                //客户端信息
+                client: null,//选择的客户端
                 allClients: [],//所有有权限的客户端
                 defaullClients: [],//默认暂时的客户端
-                noticeInfos: []//消息
+
+                noticeInfos: [],//消息
+
+                clientStyle:"client-3",
             },
             watch: {},
             methods: {
@@ -241,9 +339,16 @@
                             vm.allClients = infos.clientList;
                             vm.defaullClients = vm.allClients.filter(client => {
                                 client.AppIcon = client.AppIcon == null || client.AppIcon == "" ? "/Content/images/system/" + Math.floor(Math.random() * 3 + 1) + ".jpg" : client.AppIcon;
-                                return client.IsDefaultApp == 1;
+                                if (vm.client == null) { vm.client = client };
+
+                                return client.IsDefaultApp > 0;
                             });
+                            vm.defaullClients.sort(function (a, b) {
+                                return a.IsDefaultApp - b.IsDefaultApp;
+                            })
+                            vm.clientStyle = vm.defaullClients.length > 5 ? "client-many" : "client-" + vm.defaullClients.length;
                         }
+                        vm.isInit = true;
                     });
                 },
                 openSystem: function (client) {

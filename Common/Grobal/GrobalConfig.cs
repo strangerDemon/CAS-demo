@@ -79,11 +79,6 @@ namespace ZoneTop.Application.SSO.Common.Grobal
         public static string ManageApi = ConfigUtils.GetValue("ManageApi") == "" ? "" : ConfigUtils.GetValue("ManageApi");
 
         /// <summary>
-        /// 能调用登出接口的客户端
-        /// </summary>
-        public static string LogoutClient = ConfigUtils.GetValue("LogoutClient") == "" ? "" : ConfigUtils.GetValue("LogoutClient");
-
-        /// <summary>
         /// ticket 有效时间
         /// </summary>
         public static int TicketTimeOut = ConfigUtils.GetValue("TicketTimeOut") == "" ? 10 : int.Parse(ConfigUtils.GetValue("TicketTimeOut"));
@@ -118,5 +113,37 @@ namespace ZoneTop.Application.SSO.Common.Grobal
         /// </summary>
         public static string LoginDesc = ConfigUtils.GetValue("LoginDesc") == "" ? "厦门市土地开发总公司" : ConfigUtils.GetValue("LoginDesc");
         #endregion
+
+        #region error 配置
+        /// <summary>
+        /// 异常
+        /// </summary>
+        public static string ErrorHeader = "异常！";
+
+        /// <summary>
+        /// 异常
+        /// </summary>
+        public static string ErrorText = "请联系管理员.";
+
+        /// <summary>
+        /// 无效客户端
+        /// </summary>
+        public static string InvalidErrorHeader = "无效客户端！";
+
+        /// <summary>
+        /// 无效客户端
+        /// </summary>
+        public static string InvalidErrorText = "请检验与管理系统中配置是否一致.";
+
+        /// <summary>
+        /// 未授权!
+        /// </summary>
+        public static string UnauthorizedErrorHeader = "未授权！";
+
+        /// <summary>
+        /// 未授权!
+        /// </summary>
+        public static string UnauthorizedErrorText = "账户无此客户端权限.";
+        #endregion 
     }
 }

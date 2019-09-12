@@ -9,14 +9,14 @@
     <link rel="stylesheet" href="~/Content/css/element-ui@2.11.1.css" />
     <link rel="stylesheet" href="~/Content/css/font-awesome.min.css" />
     <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/js/utils.js"></script>
 
     <style>
 
 
-
-
         html, body, #app {
             height: 100%;
+            margin: 0px;
         }
 
         .footer {
@@ -148,25 +148,8 @@
     </style>
 
     <script>
-        var request = function (keyValue) {
-            var search = location.search.slice(1);
-            var arr = search.split("&");
-            for (var i = 0; i < arr.length; i++) {
-                var ar = arr[i].split("=");
-                if (ar[0] == keyValue) {
-                    if (unescape(ar[1]) == 'undefined') {
-                        return "";
-                    } else {
-                        return unescape(ar[1]);
-                    }
-                }
-            }
-
-            return "";
-        }
-
-        var appService = request('service');
-        var appCode = request('code');
+        var appService = getRequestParam('service');
+        var appCode = getRequestParam('code');
         var contentPath = '@Url.Content("~")'.substr(0, '@Url.Content("~")'.length - 1);
         var isIE = !!window.ActiveXObject;
         var isIE6 = isIE && !window.XMLHttpRequest;
@@ -276,7 +259,7 @@
                                     window.location.href = data.service + '?ST=' + data.st;
                                 }
                                 else {
-                                    window.location.href = contentPath + '/cas/index?&time=' + time;
+                                    window.location.href = contentPath + '/cas/index?time=' + time;
                                 }
                             } else {
                                 vm.errorText = data.message;
@@ -308,13 +291,11 @@
                 },
             },
             mounted: function () {
-                this.username = "System";
-                this.password = "123456";
+                this.username = "";
+                this.password = "";
                 this.handleClickCode();
             }
         });
-
-
 
         var initVue = new Vue({
             data: function () {
@@ -322,11 +303,7 @@
                     flag: true,
                 }
             },
-            method: {
-
-            }
-
-
+            method: {}
         })
 
         $(function () {

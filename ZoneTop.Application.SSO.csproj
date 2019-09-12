@@ -117,6 +117,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -218,6 +219,11 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\css\bootstrap.min.css" />
@@ -226,15 +232,27 @@
     <Content Include="Content\fonts\fontawesome-webfont.svg" />
     <Content Include="Content\fonts\ionicons.svg" />
     <Content Include="Content\images\bg.jpg" />
+    <Content Include="Content\images\error\404.png" />
+    <Content Include="Content\images\error\bubble.png" />
+    <Content Include="Content\images\error\cat.png" />
+    <Content Include="Content\images\error\cookie.png" />
+    <Content Include="Content\images\error\dog.png" />
+    <Content Include="Content\images\error\planet.png" />
     <Content Include="Content\images\favicon.ico" />
     <Content Include="Content\images\footer-auth.png" />
     <Content Include="Content\images\logo.png" />
+    <Content Include="Content\images\logout\bird.png" />
+    <Content Include="Content\images\logout\cloud-1.png" />
+    <Content Include="Content\images\logout\cloud-2.png" />
+    <Content Include="Content\images\logout\cloud-3.png" />
+    <Content Include="Content\images\logout\person.png" />
     <Content Include="Content\images\system\1.jpg" />
     <Content Include="Content\images\system\2.jpg" />
     <Content Include="Content\images\system\3.jpg" />
     <Content Include="Content\images\xmtz_logo.png" />
     <Content Include="Content\js\element-ui%402.11.1.js" />
     <Content Include="Content\js\jquery-2.1.1.min.js" />
+    <Content Include="Content\js\utils.js" />
     <Content Include="Content\js\vue%402.6.10.js" />
     <Content Include="Index.html" />
     <Content Include="favicon.ico" />
@@ -283,7 +301,12 @@
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

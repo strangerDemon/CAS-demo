@@ -1,5 +1,194 @@
-﻿@{
-    ViewBag.Title = "error";
-}
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
 
-<h2>error</h2>
+    <title>@ZoneTop.Application.SSO.Common.Grobal.GrobalConfig.SystemName</title>
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/js/utils.js"></script>
+    <style>
+
+        body {
+            margin: 0px;
+        }
+
+        footer {
+            background: linear-gradient(#79BBFF, #8CC5FF);
+            color: #fff;
+        }
+
+        .error-page-div {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+
+        .error-page {
+            height: 100%;
+            min-height: 750px;
+            background: linear-gradient(#40A3FF, #79BBFF);
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        a {
+            color: #3680b1;
+        }
+
+            img,
+            a img {
+                border: 0;
+                outline: 0;
+            }
+
+        .wrapper {
+            width: 980px;
+            margin: 0 auto;
+            position: relative;
+            height: 100%;
+        }
+
+        h1.not-found-text {
+            font-size: 50px;
+            color: #fff;
+            font-family: singlesleeveregular, cursive;
+            letter-spacing: 2px;
+        }
+
+        div.not-found-text {
+            position: absolute;
+            top: 180px;
+            width: 500px;
+            right: 0;
+        }
+
+        div.graphic {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 494px;
+            height: 331px;
+            font-size: 15em;
+            color: #FFF;
+            text-shadow: 10px 15px 1px #0002;
+            font-weight: bold;
+        }
+
+        div.planet {
+            position: absolute;
+            bottom: -660px;
+            margin: 0 auto;
+            width: 1000px;
+            background: url(/Content/images/error/planet.png) center no-repeat;
+            height: 1000px;
+            z-index: 0;
+        }
+
+        div.dog-wrapper {
+            position: absolute;
+            bottom: 300px;
+            left: 440px;
+        }
+
+        div.dog {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 80px;
+            z-index: 99;
+            background: url(/Content/images/error/dog.png) 0 0 no-repeat;
+        }
+
+        div.dog-bubble {
+            font-size: 14px;
+            line-height: 1.5;
+            font-style: italic;
+            height: 200px;
+            width: 250px;
+            background: url(/Content/images/error/bubble.png) center no-repeat;
+            background-size: 70% 70%;
+            padding: 20px 0;
+            position: absolute;
+            bottom: 25px;
+            left: 40px;
+            z-index: 99;
+            opacity: 0;
+            color: #555;
+            text-shadow: 1px 1px 0 #fff;
+        }
+
+            div.dog-bubble > p {
+                text-align: center;
+                padding: 0 35px;
+            }
+    </style>
+</head>
+<body>
+    <div class="error-page-div">
+        <div class='error-page'>
+            <div class="wrapper">
+                <div class="graphic">404</div>
+                <div class="not-found-text">
+                    <h1 class="not-found-text" id="error-header">异常！</h1>
+                </div>
+                <div class="dog-wrapper">
+                    <div class="dog" id="dog"></div>
+                    <div class="dog-bubble" style="opacity: 1;">
+                        <br /> <br />
+                        <p id="error-text">你迷路了吗?</p>
+                    </div>
+                </div>
+                <div class="planet" id="planet"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        //解读异常
+        readError();
+        function readError() {
+            var para = getRequestParam("para", true);
+            if (para != "") {
+                var joPara = JSON.parse(unescape(decodeURI(para)));
+                $("#error-header").text(joPara.header);
+                $("#error-text").text(joPara.context);
+            }
+        }
+
+        //动画
+        let count = 0;
+        let position = "0px 0px";
+        let degree = 0;
+
+        start();
+
+        function start() {
+            rotate();
+            dogRun();
+        }
+
+        function rotate() {
+            degree -= 0.1;
+            count++;
+            $("#planet").css("transform", "rotate(" + degree + "deg)");
+            //:style="{'transform': 'rotate(' + degree+ 'deg)','WebkitTransform':'rotate(' + degree*2 + 'deg)','-ms-transform':'rotate(' + degree + 'deg)'}"
+            requestAnimationFrame(rotate);
+        }
+
+        function dogRun() {
+            if (count % 10 === 1) {
+                if (position === "0px 0px") {
+                    position = "-80px -2px"
+                } else {
+                    position = "0px 0px"
+                }
+            }
+            $("#dog").css("background-position", position);
+            requestAnimationFrame(dogRun);
+        }
+
+    </script>
+</body>
+</html>

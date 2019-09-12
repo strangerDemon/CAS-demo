@@ -1,10 +1,8 @@
-﻿using System;
-using System.Text;
-using System.Linq;
-using System.Data.Common;
+﻿using Dapper;
+using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using ZoneTop.Application.SSO.Common.Entity;
-using Dapper;
 
 namespace ZoneTop.Application.SSO.Common.Service
 {

@@ -55,12 +55,12 @@ namespace ZoneTop.Application.SSO.Common.Service
             //var user = connection.GetList<User>("where age = 10 or Name like '%Smith%'");  
             //var user = connection.GetList<User>(new { Age = 10 })
             var strSql = new StringBuilder();
-            strSql.Append(" select t.* from T_App t ");
-            strSql.Append(" where 1 = 1 and t.DeleteMark = 0 and t.EnabledMark = 1 ");//有效
-            strSql.Append(" and  t.IsJoinSso = 1 ");//接入单点
+            //    strSql.Append(" select t.* from T_App t ");
+            strSql.Append(" where 1 = 1 and DeleteMark = 0 and EnabledMark = 1 ");//有效
+            strSql.Append(" and IsJoinSso = 1 ");//接入单点
             if (!String.IsNullOrEmpty(userId))//用户权限
             {
-                strSql.Append(" and t.AppId in (select AppId from T_AppAuth where UserId = '" + userId + "')");
+                strSql.Append(" and AppId in (select AppId from T_AppAuth where UserId = '" + userId + "')");
             }
             using (_connection = _DbFactory.GetOpenConnection())
             {

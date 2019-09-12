@@ -2,6 +2,7 @@
 using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 using ZoneTop.Application.SSO.Common.Entity;
 using ZoneTop.Application.SSO.Common.Grobal;
@@ -36,25 +37,24 @@ namespace ZoneTop.Application.SSO.Controllers
                 //客户端来的防伪标识
                 string code = Request["code"] == null ? "" : Request["code"].ToString();
                 UserModel user = UserUtils.Provider.Current();
-
                 if (!service.Equals("") && !ClientUtils.Provider.ValideClient(service))//无效service
                 {
-                    MyRedirect("/cas/error?type=021", false);
+                    MyRedirect("/cas/error", false, new { header = GrobalConfig.InvalidErrorHeader, context = GrobalConfig.InvalidErrorText });
                 }
-                if (user != null)//用户已登陆
+                else if (user != null)//用户已登陆
                 {
                     if (service.Equals(""))
                     {
-                        MyRedirect("/cas/index", false);//跳转到集成页面
+                        MyRedirect("/cas/index", false, null);//跳转到集成页面
                     }
                     else if (ClientUtils.Provider.UserValideClient(service))
                     {
                         string ST = ClientUtils.Provider.GetTicket(service, code);
-                        MyRedirect(service + "?ST=" + ST, false);
+                        MyRedirect(service + "?ST=" + ST, false, null);
                     }
                     else//用户无service权限
                     {
-                        MyRedirect("/cas/error?type=022", false);
+                        MyRedirect("/cas/error", false, new { header = GrobalConfig.UnauthorizedErrorHeader, context = GrobalConfig.UnauthorizedErrorText });
                     }
                 }
                 return View();
@@ -63,7 +63,7 @@ namespace ZoneTop.Application.SSO.Controllers
             {
                 LogUtils.myError(log, ex);
                 //跳转系统未授权页面
-                MyRedirect("/cas/error?type=00" + ex.Message, false);
+                MyRedirect("/cas/error", false, new { header = GrobalConfig.ErrorHeader, context = GrobalConfig.ErrorText });
                 return View();
             }
         }
@@ -80,14 +80,14 @@ namespace ZoneTop.Application.SSO.Controllers
                 var service = Request["service"];
                 UserModel user = UserUtils.Provider.Current();
 
-                List<ClientEntity> clients = ClientUtils.Provider.getAllAuthClient(user.UserId).ToJson().ToList<ClientEntity>();
+                List<ClientEntity> clients = ClientUtils.Provider.getAllAuthClient(user.UserId).ToList();
                 ClientEntity client = null;
 
                 bool isLogoutAll = true;
                 if (service != null)//客户端请求登出页面
                 {
                     client = clients.Find(t => t.AppSvcUrl == service);
-                    isLogoutAll = client.SingleLogin == 1;
+                    isLogoutAll = client.SingleLogout == 1;
                 }
 
                 if (isLogoutAll)
@@ -154,10 +154,21 @@ namespace ZoneTop.Application.SSO.Controllers
         /// </summary>
         /// <param name="url"></param>
         /// <param name="isOver"></param>
-        private void MyRedirect(string url, bool isOver)
+        /// <param name="param"></param>
+        private void MyRedirect(string url, bool isOver, object param)
         {
             Response.Clear();
+            //todo：隐式传参
+            string connect = url.IndexOf("?") > 0 ? "&" : "?";
+            if (param != null)
+            {
+                url += "?para=" + Server.UrlEncode(JsonUtils.ToJson(param));
+                connect = "&";
+            }
+            //加时间戳
+            url += connect + "datetime=" + DateTime.Now.Ticks;
             Response.Redirect(url, isOver);
+            Response.End();
         }
         #endregion
 
@@ -173,7 +184,6 @@ namespace ZoneTop.Application.SSO.Controllers
         {
             UserModel user = UserUtils.Provider.Current();
             IEnumerable<ClientEntity> clientList = ClientUtils.Provider.getAllAuthClient(user.UserId);
-
             JObject systemInfo = JsonUtils.ReadJsonConfig("SysConfig.json");
             var objResult = new
             {
@@ -225,7 +235,7 @@ namespace ZoneTop.Application.SSO.Controllers
                     if (otherSessionId != null && !otherSessionId.Equals("") && !otherSessionId.Equals(UserUtils.Provider.getCurrentSession()))//redis 中存在（已在别地登录）
                     {
                         UserModel user = UserUtils.Provider.GetUser(otherSessionId);
-                        List<ClientEntity> clients = ClientUtils.Provider.getAllAuthClient(user.UserId).ToJson().ToList<ClientEntity>();
+                        List<ClientEntity> clients = ClientUtils.Provider.getAllAuthClient(user.UserId).ToList();
                         //post 请求清理客户端用户登录信息
                         ClientUtils.Provider.LogoutAllAction(user, clients, "");
 
@@ -333,10 +343,7 @@ namespace ZoneTop.Application.SSO.Controllers
             JObject joResult = new JObject();
             try
             {
-                string client = Request["client"] == null ? "" : Request["client"].ToString();//客户端
-
                 #region 接口权限
-                string service = Request["service"] == null ? "" : Request["service"].ToString();//调用的客户端
                 string clientSessionId = Request["sessionId"] == null ? "" : Request["sessionId"].ToString();//客户端sessionid
                 string code = Request["code"] == null ? "" : Request["code"].ToString();//客户端防伪标识
 
@@ -345,15 +352,16 @@ namespace ZoneTop.Application.SSO.Controllers
                     throw new Exception("请求接口仅已客户端可调用！");
                 }
 
-                if (!ClientUtils.Provider.isApiAuth(service))
-                {
-                    throw new Exception("客户端无调用接口权限！");
-                }
+                string service = Request["service"] == null ? "" : Request["service"].ToString();//调用的客户端
+                ClientEntity clientEntity = ClientUtils.Provider.GetClient(service);
+
+                ClientUtils.Provider.isApiAuth(clientEntity);
                 #endregion
 
+                string client = Request["client"] == null ? "" : Request["client"].ToString();//客户端
                 if (!client.Equals(""))
                 {
-                    List<ClientEntity> clientList = ClientUtils.Provider.getAllClient().ToJson().ToList<ClientEntity>();
+                    List<ClientEntity> clientList = ClientUtils.Provider.getAllClient().ToList();
                     ClientEntity _client = clientList.Find(t => t.AppSvcUrl == client);
                     if (_client == null)
                     {
@@ -413,27 +421,24 @@ namespace ZoneTop.Application.SSO.Controllers
             JObject joResult = new JObject();
             try
             {
-                #region 验证调用权限
-                string service = Request["service"] == null ? "" : Request["service"].ToString();//客户端
+                #region 验证调用权限               
                 string clientSessionId = Request["sessionId"] == null ? "" : Request["sessionId"].ToString();//客户端sessionid
                 string code = Request["code"] == null ? "" : Request["code"].ToString();//客户端防伪标识
 
                 if (!ClientUtils.Provider.ApiIdentifyCheck(clientSessionId, code))
                 {
-                    throw new Exception("请求接口仅已客户端可调用！");
+                    throw new Exception("请求接口仅已登录客户端可调用！");
                 }
 
-                if (!ClientUtils.Provider.isApiAuth(service))
-                {
-                    throw new Exception("客户端无调用接口权限！");
-                }
+                string service = Request["service"] == null ? "" : Request["service"].ToString();//客户端
+                ClientEntity clientEntity = ClientUtils.Provider.GetClient(service);
 
-                if (!ClientUtils.Provider.LogoutClient(service))
-                {
-                    throw new Exception("客户端无权限调用！");
-                }
+                ClientUtils.Provider.isApiAuth(clientEntity);
+
+                ClientUtils.Provider.LogoutClient(clientEntity);
                 #endregion
 
+                #region 账户
                 string account = Request["account"] == null ? "" : Request["account"].ToString();//用户账号
                 if (account.Equals(""))
                 {
@@ -458,8 +463,9 @@ namespace ZoneTop.Application.SSO.Controllers
                 {
                     throw new Exception("用户未登录客户端！");
                 }
+                #endregion 
 
-                List<ClientEntity> clientList = ClientUtils.Provider.getAllAuthClient(user.UserId).ToJson().ToList<ClientEntity>();
+                List<ClientEntity> clientList = ClientUtils.Provider.getAllAuthClient(user.UserId).ToList();
 
                 #region 只登出具体客户端 废弃
                 /*string client = Request["client"] == null ? "" : Request["client"].ToString();//需要登出的客户端 
@@ -528,8 +534,7 @@ namespace ZoneTop.Application.SSO.Controllers
             JObject joResult = new JObject();
             try
             {
-                #region 接口权限
-                string service = Request["service"] == null ? "" : Request["service"].ToString();//客户端
+                #region 接口权限               
                 string clientSessionId = Request["sessionId"] == null ? "" : Request["sessionId"].ToString();//客户端sessionid
                 string code = Request["code"] == null ? "" : Request["code"].ToString();//客户端防伪标识
 
@@ -538,10 +543,10 @@ namespace ZoneTop.Application.SSO.Controllers
                     throw new Exception("请求接口仅已登录客户端可调用！");
                 }
 
-                if (!ClientUtils.Provider.isApiAuth(service))
-                {
-                    throw new Exception("客户端无调用接口权限！");
-                }
+                string service = Request["service"] == null ? "" : Request["service"].ToString();//客户端
+                ClientEntity clientEntity = ClientUtils.Provider.GetClient(service);
+
+                ClientUtils.Provider.isApiAuth(clientEntity);
                 #endregion
 
                 string account = Request["account"] == null ? "" : Request["account"].ToString();//用户账号
@@ -550,7 +555,7 @@ namespace ZoneTop.Application.SSO.Controllers
                 List<HttpModel> paras = new List<HttpModel>();
                 //paras.Add(new HttpModel("account", account));
                 paras.Add(new HttpModel("updateTime", updateTime));
-                string url = GrobalConfig.ManageApi + "/SSO/GetUserInfo/";
+                string url = GrobalConfig.ManageApi + "/api/GetUserInfo/";
                 string userInfo = HttpUtils.RestRequest(url, Method.GET, paras, null);
                 JObject joUserInfo = JObject.Parse(userInfo);
                 if (joUserInfo["message"] != null)
